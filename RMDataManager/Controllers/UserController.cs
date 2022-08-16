@@ -12,7 +12,7 @@ namespace RMDataManager.Controllers
     [Authorize]
     public class UserController : ApiController
     {
-        public List<UserModel> GetById()
+        public UserModel GetById()
         {
             string userId = RequestContext.Principal.Identity.GetUserId(); 
             //not passing in string Id. Do it this way to prevent people from guessing
@@ -20,7 +20,7 @@ namespace RMDataManager.Controllers
 
             UserData data = new UserData();
 
-            return data.GetUserById(userId);
+            return data.GetUserById(userId).First();
         }
 
         

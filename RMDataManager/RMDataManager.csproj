@@ -300,9 +300,9 @@
     <Content Include="Scripts\jquery-3.6.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TRMDataManager.Library\TRMDataManager.Library.csproj">
+    <ProjectReference Include="..\TRMDataManager.Library\RMDataManager.Library.csproj">
       <Project>{34EF2D4E-B4E8-4B19-940E-C13B2F996879}</Project>
-      <Name>TRMDataManager.Library</Name>
+      <Name>RMDataManager.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
