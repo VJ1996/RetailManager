@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RMDesktop.UI.Library.Api;
+using RMDesktop.UI.Library.Helpers;
 using RMDesktop.UI.Library.Models;
 using RMDesktopUI.Helpers;
 using RMDesktopUI.Library.Api;
@@ -36,8 +37,8 @@ namespace RMDesktopUI
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<IAPIHelper, APIHelper>()
-                .Singleton<ILoggedInUserModel, LoggedInUserModel>()
-                ;
+                .Singleton<IConfigHelper, ConfigHelper>()
+                .Singleton<ILoggedInUserModel, LoggedInUserModel>();
 
             GetType().Assembly.GetTypes()
                 .Where(type => type.IsClass)

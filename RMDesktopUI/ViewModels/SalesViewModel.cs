@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using RMDesktop.UI.Library.Api;
+using RMDesktop.UI.Library.Helpers;
 using RMDesktop.UI.Library.Models;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,11 @@ namespace RMDesktopUI.ViewModels
     public  class SalesViewModel : Screen
     {
         IProductEndPoint _productEndPoint;
-        
-        public SalesViewModel(IProductEndPoint productEndpoint)
+        IConfigHelper _configHelper;
+        public SalesViewModel(IProductEndPoint productEndpoint, IConfigHelper configHelper)
         {
             _productEndPoint = productEndpoint;
+            _configHelper = configHelper;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -86,22 +88,28 @@ namespace RMDesktopUI.ViewModels
 		{
 			get
 			{
-                decimal subTotal = 0;
-
-                foreach(var item in Cart)
-                {
-                    subTotal +=item.Product.RetailPrice * item.QuantityInCart;
-                }
-				return subTotal.ToString("C"); //convert to currency format
+				return CalculateSubTotal().ToString("C"); //convert to currency format
 			}
 		}
+
+        private decimal CalculateSubTotal()
+        {
+            decimal subTotal = 0;
+
+            foreach (var item in Cart)
+            {
+                subTotal += item.Product.RetailPrice * item.QuantityInCart;
+            }
+             
+            return subTotal;
+        }
 
         public string Total
         {
             get
             {
-                // TODO: Replace with calculation
-                return "$0.00";
+                decimal total = CalculateSubTotal()+CalculateTax();
+                return total.ToString("C");
             }
         }
 
@@ -109,12 +117,24 @@ namespace RMDesktopUI.ViewModels
         {
             get
             {
-                // TODO: Replace with calculation
-                return "$0.00";
+                return CalculateTax().ToString("C");
             }
         }
 
+        private decimal CalculateTax()
+        {
 
+            decimal taxAmount = 0;
+            decimal taxRate = _configHelper.GetTaxRate();
+            foreach (var item in Cart)
+            {
+                if (item.Product.IsTaxable)
+                {
+                    taxAmount += (item.Product.RetailPrice * item.QuantityInCart * (taxRate/100));
+                }
+            }
+            return taxAmount;
+        }
 
         public bool CanAddToCart
         {
@@ -154,6 +174,8 @@ namespace RMDesktopUI.ViewModels
             SelectedProduct.QuantityInStock -= ItemQuantity;
             ItemQuantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => existingItem.DisplayText);
         }
 
@@ -172,6 +194,8 @@ namespace RMDesktopUI.ViewModels
         public void RemoveFromCart()
         {
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public bool CanCheckOut
