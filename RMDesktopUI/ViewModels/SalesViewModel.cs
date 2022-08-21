@@ -15,10 +15,12 @@ namespace RMDesktopUI.ViewModels
     {
         IProductEndPoint _productEndPoint;
         IConfigHelper _configHelper;
-        public SalesViewModel(IProductEndPoint productEndpoint, IConfigHelper configHelper)
+        ISaleEndPoint _saleEndPoint;
+        public SalesViewModel(IProductEndPoint productEndpoint, IConfigHelper configHelper, ISaleEndPoint saleEndPoint)
         {
             _productEndPoint = productEndpoint;
             _configHelper = configHelper;
+            _saleEndPoint = saleEndPoint;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -127,18 +129,13 @@ namespace RMDesktopUI.ViewModels
             decimal taxAmount = 0;
             decimal taxRate = _configHelper.GetTaxRate();
 
-            taxAmount = Cart
-                .Where(x => x.Product.IsTaxable)
-                .Sum(x => x.Product.RetailPrice * x.QuantityInCart * taxRate);
-
-
-            /*foreach (var item in Cart)
+            foreach (var item in Cart)
             {
                 if (item.Product.IsTaxable)
                 {
-                    taxAmount += (item.Product.RetailPrice * item.QuantityInCart * (taxRate/100));
+                    taxAmount += (item.Product.RetailPrice * item.QuantityInCart * (taxRate / 100));
                 }
-            }*/
+            }
             return taxAmount;
         }
 
@@ -183,6 +180,8 @@ namespace RMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => existingItem.DisplayText);
+            NotifyOfPropertyChange(() => CanCheckOut);
+
         }
 
         public bool CanRemoveFromCart
@@ -202,6 +201,7 @@ namespace RMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public bool CanCheckOut
@@ -210,14 +210,31 @@ namespace RMDesktopUI.ViewModels
             {
                 bool output = false;
 
+                if(Cart.Count > 0)
+                {
+                    output = true;
+                }
+
                 //Make sure there is something in the cart
 
                 return output;
             }
         }
-        public void CheckOut()
+        public async Task CheckOut()
         {
+            SaleModel sale = new SaleModel();
+            foreach(var item in Cart)
+            {
+                sale.SaleDetails.Add(new SaleDetailModel
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.QuantityInCart
+                });
+                
+            }
 
+            await _saleEndPoint.PostSale(sale);
+            // Create a SaleModel and post to API
         }
     }
 }
