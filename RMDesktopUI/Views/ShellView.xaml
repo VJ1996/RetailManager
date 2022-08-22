@@ -8,11 +8,11 @@
         Title="ShellView" Height="600" Width="1000">
     <DockPanel>
         <Menu DockPanel.Dock="Top" FontSize="18">
-            <MenuItem Header="_File">
-                
+            <MenuItem Header="_File" Width="90">
+                <MenuItem x:Name="ExitApplication" Header="E_xit" Width="auto" />
             </MenuItem>
-            <MenuItem Header="_Account">
-                <MenuItem x:Name="LoginScreen" Header="_Login"/>
+            <MenuItem Header="_Account" Width="90" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+                <MenuItem x:Name="LogOut" Header="_Log Out"/>
             </MenuItem>
         </Menu>
         <Grid>
