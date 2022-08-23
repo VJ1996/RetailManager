@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 
 namespace RMDataManager.Library.Models
 {
-    public class SaleDetailDBModel
+    public class InventoryModel
     {
-        
-        public int SaleId { get; set; }
-        public int ProductId { get; set; }
+        public int Productid { get; set; }
         public int Quantity { get; set; }
         public decimal PurchasePrice { get; set; }
-        public decimal Tax { get; set; }
+        public DateTime PurchaseDate { get; set; }
 
     }
 }

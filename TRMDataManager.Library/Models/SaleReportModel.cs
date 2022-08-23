@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace RMDataManager.Library.Models
 {
-    public class SaleDBModel
+    public class SaleReportModel
     {
-        public int Id { get; set; }
-        public string CashierId { get; set; }
-        public DateTime SaleDate { get; set; } = DateTime.UtcNow;
+        public DateTime SaleDate { get; set; }
         public decimal SubTotal { get; set; }
         public decimal Tax { get; set; }
         public decimal Total { get; set; }
-
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string EmailAddress { get; set; }
     }
 }

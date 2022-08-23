@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
-using TRMDataManager.Library.DataAccess;
-using TRMDataManager.Library.Models;
+using RMDataManager.Library.DataAccess;
+using RMDataManager.Library.Models;
 
 namespace RMDataManager.Controllers
 {

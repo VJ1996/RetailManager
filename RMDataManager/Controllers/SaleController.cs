@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using TRMDataManager.Library.DataAccess;
+using RMDataManager.Library.DataAccess;
 
 namespace RMDataManager.Controllers
 {
@@ -22,11 +22,12 @@ namespace RMDataManager.Controllers
             saleData.SaveSale(sale, userId);
         }
 
-       /* public List<ProductModel> Get()
+        [Route("GetSalesReport")]
+        public List<SaleReportModel> GetSalesReport()
         {
-            ProductData data = new ProductData();
-
-            return data.GetProducts();
-        }*/
+            SaleData data = new SaleData();
+            return data.GetSaleReport();
+        }
+       
     }
 }

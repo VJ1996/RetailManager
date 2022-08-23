@@ -7,10 +7,9 @@ using System.Configuration.Internal;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TRMDataManager.Library.Internal.DataAccess;
-using TRMDataManager.Library.Models;
+using RMDataManager.Library.Internal.DataAccess;
 
-namespace TRMDataManager.Library.DataAccess
+namespace RMDataManager.Library.DataAccess
 {
     public class SaleData
     {
@@ -88,19 +87,16 @@ namespace TRMDataManager.Library.DataAccess
                     throw;
                 }
             }
-
-            // Get ID from sale model
-            
-            // save the sale detail models
         }
 
-        /*public List<ProductModel> GetProducts()
+        public List<SaleReportModel> GetSaleReport()
         {
             SqlDataAccess sql = new SqlDataAccess();
 
-            var output = sql.LoadData<ProductModel, dynamic>("dbo.spProduct_GetAll", new { }, "RMData");
-
+            var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "RMData");
             return output;
-        }*/
+        }
+
+
     }
 }

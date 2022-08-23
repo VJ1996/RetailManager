@@ -1,32 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RMDataManager.Library.Internal.DataAccess;
 using RMDataManager.Library.Models;
+using RMDesktop.UI.Library.Models;
 
 namespace RMDataManager.Library.DataAccess
 {
-    public class ProductData
+    public class InventoryData
     {
-        public List<ProductModel> GetProducts()
+        public List<InventoryModel> GetInventory()
         {
             SqlDataAccess sql = new SqlDataAccess();
 
-            var output = sql.LoadData<ProductModel, dynamic>("dbo.spProduct_GetAll",new { }, "RMData");
+            var output = sql.LoadData<InventoryModel, dynamic>("dbo.spInventory_GetAll", new { }, "RMData");
 
             return output;
         }
 
-        public ProductModel GetProductById(int productId)
+        public void SaveInventoryRecord(InventoryModel item)
         {
             SqlDataAccess sql = new SqlDataAccess();
-
-            var output = sql.LoadData<ProductModel, dynamic>("dbo.spProduct_GetById", new {Id = productId }, "RMData").FirstOrDefault();
-
-            return output;
+            sql.SaveData("dbo.spInventory_Insert", item, "RMData");
         }
     }
-    
 }
