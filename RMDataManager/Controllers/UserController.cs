@@ -12,6 +12,7 @@ namespace RMDataManager.Controllers
     [Authorize]
     public class UserController : ApiController
     {
+        [HttpGet]
         public UserModel GetById()
         {
             string userId = RequestContext.Principal.Identity.GetUserId(); 
@@ -22,7 +23,5 @@ namespace RMDataManager.Controllers
 
             return data.GetUserById(userId).First();
         }
-
-        
     }
 }
