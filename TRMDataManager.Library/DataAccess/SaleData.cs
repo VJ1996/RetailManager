@@ -17,9 +17,8 @@ namespace TRMDataManager.Library.DataAccess
         public void SaveSale(SaleModel saleInfo, string cashierId)
         {
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
-            var taxRate = ConfigHelper.GetTaxRate()/100;
-
             ProductData products = new ProductData();
+            var taxRate = ConfigHelper.GetTaxRate() / 100;
 
             //Start filling in the sale detail models we will save to the database
             // Fill in the available info
@@ -62,20 +61,36 @@ namespace TRMDataManager.Library.DataAccess
             // create Sale Model
             // Save sale model
 
-            SqlDataAccess sql = new SqlDataAccess();
+            
 
-            sql.SaveData<SaleDBModel>("dbo.spSale_Insert", sale, "RMData");
+            using(SqlDataAccess sql = new SqlDataAccess())
+            {
+                try
+                {
+                    sql.StartTransaction("RMData");
+                    sql.SaveDataInTransaction("dbo.spSale_Insert", sale);
+                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("spSale_Lookup", new { sale.CashierId, sale.SaleDate }).FirstOrDefault();
+
+                    // Finish filling in the sale detail models
+                    foreach (var item in details)
+                    {
+                        item.SaleId = sale.Id;
+
+                        sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
+                    }
+
+                    sql.CommitTransaction();
+                    
+                }
+                catch (Exception ex)
+                {
+                    sql.RollbackTransaction();
+                    throw;
+                }
+            }
 
             // Get ID from sale model
-            sale.Id =  sql.LoadData<int, dynamic>("spSale_Lookup", new {sale.CashierId, sale.SaleDate}, "RMData").FirstOrDefault();
-
-            // Finish filling in the sale detail models
-            foreach(var item in details)
-            {
-                item.SaleId = sale.Id;
-
-                sql.SaveData("dbo.spSaleDetail_Insert", item, "RMData");
-            }
+            
             // save the sale detail models
         }
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace TRMDataManager.Library.Internal.DataAccess
 {
-    internal class SqlDataAccess
+    internal class SqlDataAccess : IDisposable
     {
         public string GetConnectionString(string name)
         {
@@ -34,12 +34,85 @@ namespace TRMDataManager.Library.Internal.DataAccess
         {
             string connectionString = GetConnectionString(connectionStringName);
 
-            using (IDbConnection connection = new SqlConnection())
+            using (IDbConnection connection = new SqlConnection(connectionString))
             {
                 connection.ConnectionString = connectionString;
                 connection.Execute(storedProcedure, parameters,
                     commandType: CommandType.StoredProcedure);
             }
         }
+
+        private IDbConnection _connection;
+        private IDbTransaction _transaction;
+        public void StartTransaction(string connectionStringName)
+        {
+            string connectionString = GetConnectionString(connectionStringName);
+
+            _connection = new SqlConnection(connectionString);
+            _connection.Open();
+
+            _transaction = _connection.BeginTransaction();
+
+            isClosed = false;
+
+        }
+
+        public void SaveDataInTransaction<T>(string storedProcedure, T parameters)
+        {
+                _connection.Execute(storedProcedure, parameters,
+                    commandType: CommandType.StoredProcedure, transaction: _transaction);
+
+            
+        }
+
+        public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
+        {
+            
+            List<T> rows = _connection.Query<T>(storedProcedure, parameters,
+                    commandType: CommandType.StoredProcedure, transaction: _transaction).ToList();
+
+            return rows;
+        }
+
+        private bool isClosed = false;
+        public void CommitTransaction()
+        {
+            _transaction?.Commit();
+            _connection?.Close();
+
+            isClosed = true;
+        }
+
+        public void RollbackTransaction()
+        {
+            _transaction?.Rollback();
+            _connection?.Close();
+
+            isClosed = true;
+        }
+
+        public void Dispose()
+        {
+            if (!isClosed)
+            {
+                try
+                {
+                    CommitTransaction();
+                }
+                catch
+                {
+                    // TODO - Log this issue
+                }
+            }
+
+            _transaction = null;
+            _connection = null;
+        }
+
+        // Open connection/start transaction method
+        // load using the transaction
+        // save using the transaction
+        // Closer connection/stop transaction method
+        // Dispose
     }
 }
